@@ -6,10 +6,17 @@ const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY, {
 })
 
 router.post('/', async (req, res) => {
+
+    const { amount } = req.body;
+
+    if (!amount) return res.status(400).json({ status: 'failed', message: 'no amount specified' });
+
+    const price = amount.split('£').at(-1);
+
     try {
         const paymentIntent = await stripe.paymentIntents.create({
             currency: 'gbp',
-            amount: '120',
+            amount: price,
             automatic_payment_methods: {
                 enabled: true
             }
@@ -17,6 +24,8 @@ router.post('/', async (req, res) => {
     
         res.send({ clientSecret: paymentIntent.client_secret });
     } catch (error) {
+        console.log(error);
+        
         return res.status(400).send({
             error: error.message
         })
