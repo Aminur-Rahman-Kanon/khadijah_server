@@ -63,8 +63,52 @@ function sendOrderConfirmationPromise (booking) {
     })
 }
 
+function sendContactQueryPromise (data) {
+    return new Promise( async (resolve, reject) => {
+    
+        try {
+            const transporter = nodeMailer.createTransport({
+                service: 'gmail',
+                auth: {
+                  user: 'khadijahwebservice@gmail.com',
+                  pass: 'bjdrbgzhgxrtlqfd'
+                }
+            });
+    
+            if (!transporter) return { status: 'failed', message: 'no transporter found' };
+            
+            const mailOptions = {
+                from: 'khadijahwebservice@gmail.com',
+                to: 'kanon754@gmail.com',
+                subject: 'A contact query received',
+                text: 'Here is the details',
+                html: `<div>
+                    <div>
+                        <h2 style="margin: 5px 0; color: black;">Contact Details</h2>
+                        <p style="margin: 5px 0; color: black;">Name: ${data.name}</p>
+                        <p style="margin: 5px 0; color: black;">Email: ${data.email}</p>
+                        <p style="margin: 5px 0; color: black;">Message: ${data.message}</p>
+                    </div>
+                </div>`
+            };
+            
+            await transporter.sendMail(mailOptions, function(error, info){
+                if (error) {
+                    reject({ status: 'failed', message: error.message });
+                } else {
+                    resolve({ status: 'success', message: info })
+                }
+            });
+            
+        } catch (error) {
+            reject({ status: 'failed', message: error.message })
+        }
+    })
+}
+
 
 module.exports = {
     cronJob,
-    sendOrderConfirmationPromise
+    sendOrderConfirmationPromise,
+    sendContactQueryPromise
 }
