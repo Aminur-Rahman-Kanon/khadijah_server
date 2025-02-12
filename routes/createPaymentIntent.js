@@ -11,12 +11,10 @@ router.post('/', async (req, res) => {
 
     if (!amount) return res.status(400).json({ status: 'failed', message: 'no amount specified' });
 
-    const price = amount.split('£').at(-1);
-
     try {
         const paymentIntent = await stripe.paymentIntents.create({
             currency: 'gbp',
-            amount: price,
+            amount: amount,
             automatic_payment_methods: {
                 enabled: true
             }
